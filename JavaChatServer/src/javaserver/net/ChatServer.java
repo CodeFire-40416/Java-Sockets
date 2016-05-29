@@ -21,6 +21,7 @@ import javaserver.Main;
  */
 public class ChatServer implements Runnable {
 
+    private static final int CLIENT_SERVER_PORT = 5782;
     private static final int SERVER_TIMEOUT = 1000;
 
     private int port;
@@ -64,6 +65,7 @@ public class ChatServer implements Runnable {
     /**
      * Delegate command.
      *
+     * @param address
      * @param dis input stream.
      * @param dos output stream.
      * @throws IOException
@@ -96,10 +98,10 @@ public class ChatServer implements Runnable {
         String message = dis.readUTF();
 
         System.out.printf("  Address: %s\n  Message: %s\n", recipient, message);
-        
+
         boolean success = false;
 
-        try (Socket client = new Socket(recipient, 5781)) {
+        try (Socket client = new Socket(recipient, CLIENT_SERVER_PORT)) {
             DataOutputStream client_dos = new DataOutputStream(client.getOutputStream());
             DataInputStream client_dis = new DataInputStream(client.getInputStream());
 
@@ -109,9 +111,9 @@ public class ChatServer implements Runnable {
             client_dos.flush();
             client_dos.writeUTF(message);
             client_dos.flush();
-            
+
             String response = client_dis.readUTF();
-            
+
             if ("OK".equals(response)) {
                 success = true;
             }
